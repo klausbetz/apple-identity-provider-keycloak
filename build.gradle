@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group 'at.deckweiss'
+version '1.0.0'
+java.sourceCompatibility = JavaVersion.VERSION_11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.keycloak:keycloak-core:18.0.0'
+    compileOnly 'org.keycloak:keycloak-server-spi:18.0.0'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:18.0.0'
+    compileOnly 'org.keycloak:keycloak-services:18.0.0'
+
+    testImplementation 'org.keycloak:keycloak-services:18.0.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+}
