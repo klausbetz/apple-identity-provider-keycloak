@@ -38,6 +38,9 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 | p8 Key         | Raw content of p8 key file you get from your Apple developer account.                                                                                                                                           |
 | Default Scopes | Scopes to request from Apple (for web-based logins). defaults to `openid%20name%20email`                                                                                                                        |
 
+:warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
+URLs in your Apple developer account.
+
 ## Token exchange
 
 Token exchange can be used to trade an Apple `authorizationCode` for Keycloak access- and refresh-tokens.  
