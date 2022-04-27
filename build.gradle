@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'at.deckweiss'
+group 'at.klausbetz'
 version '1.0.0'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
