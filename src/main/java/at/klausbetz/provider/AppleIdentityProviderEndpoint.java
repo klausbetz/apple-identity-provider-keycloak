@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 
 import static at.klausbetz.provider.AppleIdentityProvider.OAUTH2_PARAMETER_CODE;
 
-class AppleIdentityProviderEndpoint {
+public class AppleIdentityProviderEndpoint {
 
     protected static final Logger logger = Logger.getLogger(AppleIdentityProviderEndpoint.class);
 
