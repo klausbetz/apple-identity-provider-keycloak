@@ -21,7 +21,7 @@ still a preview feature in v18.0).
 
 ## Installation
 
-1. Make sure you have a copy of the latest JAR of this provider package.
+1. Make sure you have a copy of the latest [JAR](https://github.com/klausbetz/apple-identity-provider-keycloak/releases/latest) of this provider package.
 2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` if you use docker; alternatively see
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
 3. Keycloak might need a restart (or a whole new container when using docker)
