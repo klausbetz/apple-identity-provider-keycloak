@@ -85,7 +85,7 @@ public class AppleIdentityProviderEndpoint {
         try {
             if (authorizationCode != null) {
                 appleIdentityProvider.prepareClientSecret(appleIdentityProvider.getConfig().getClientId());
-                BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, user, authSession);
+                BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, appleIdentityProvider.getConfig().getClientId(), user, authSession);
                 return callback.authenticated(federatedIdentity);
             }
         } catch (WebApplicationException e) {
