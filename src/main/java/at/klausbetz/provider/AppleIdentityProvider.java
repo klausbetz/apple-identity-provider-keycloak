@@ -30,6 +30,7 @@ import org.keycloak.representations.JsonWebToken;
 import org.keycloak.services.ErrorResponseException;
 import org.keycloak.services.Urls;
 import org.keycloak.sessions.AuthenticationSessionModel;
+import org.keycloak.vault.VaultStringSecret;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -107,8 +108,8 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         }
     }
 
-    public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String userDataJson, AuthenticationSessionModel authSession) throws IOException {
-        SimpleHttp.Response response = generateTokenRequest(authorizationCode).asResponse();
+    public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String clientId, String userDataJson, AuthenticationSessionModel authSession) throws IOException {
+        SimpleHttp.Response response = generateTokenRequest(authorizationCode, clientId).asResponse();
 
         if (response.getStatus() > 299) {
             logger.warn("Error response from apple: status=" + response.getStatus() + ", body=" + response.asString());
@@ -145,13 +146,15 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         return user;
     }
 
-    public SimpleHttp generateTokenRequest(String authorizationCode) {
+    public SimpleHttp generateTokenRequest(String authorizationCode, String clientId) {
         KeycloakContext context = session.getContext();
-        SimpleHttp tokenRequest = SimpleHttp.doPost(getConfig().getTokenUrl(), session)
-                                            .param(OAUTH2_PARAMETER_CODE, authorizationCode)
-                                            .param(OAUTH2_PARAMETER_REDIRECT_URI, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), getConfig().getAlias(), context.getRealm().getName()).toString())
-                                            .param(OAUTH2_PARAMETER_GRANT_TYPE, OAUTH2_GRANT_TYPE_AUTHORIZATION_CODE);
-        return authenticateTokenRequest(tokenRequest);
+        VaultStringSecret clientSecret = session.vault().getStringSecret(getConfig().getClientSecret());
+        return SimpleHttp.doPost(getConfig().getTokenUrl(), session)
+                         .param(OAUTH2_PARAMETER_CODE, authorizationCode)
+                         .param(OAUTH2_PARAMETER_REDIRECT_URI, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), getConfig().getAlias(), context.getRealm().getName()).toString())
+                         .param(OAUTH2_PARAMETER_GRANT_TYPE, OAUTH2_GRANT_TYPE_AUTHORIZATION_CODE)
+                         .param(OAUTH2_PARAMETER_CLIENT_ID, clientId)
+                         .param(OAUTH2_PARAMETER_CLIENT_SECRET, clientSecret.get().orElse(getConfig().getClientSecret()));
     }
 
     private String generateJWS(String p8Content, String keyId, String teamId, String clientId) {
@@ -207,15 +210,10 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         String clientId = appIdentifier != null && !appIdentifier.isBlank() ? appIdentifier : getConfig().getClientId();
         try {
             prepareClientSecret(clientId);
-            return sendTokenRequest(authorizationCode, userJson, null);
+            return sendTokenRequest(authorizationCode, clientId, userJson, null);
         } catch (IOException e) {
             logger.warn("Error exchanging apple authorization_code. clientId=" + clientId, e);
             return null;
         }
     }
-
-//    private AuthenticationSessionModel prepareLoginSession(String authorizationCode) {
-//        EventBuilder event = new EventBuilder(session.getContext().getRealm(), session, clientConnection).event(EventType.LOGIN);
-//        return ClientSessionCode.getClientSession(authorizationCode, UUID.randomUUID().toString(), session, session.getContext().getRealm(), session.getContext().getClient(), event, AuthenticationSessionModel.class);
-//    }
 }
