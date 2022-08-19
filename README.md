@@ -16,12 +16,15 @@ compatible to Keycloak. Differences are as follows:
 
 ## General
 
-This extension was tested with Keycloak 18.0 using docker. It's not yet compatible to the newer `Admin UI (admin2)` from Keycloak (which is
-still a preview feature in v18.0).
+This extension was tested with Keycloak 19.0 using docker.  
+:warning: It's not yet compatible to the new `Admin UI (keycloak.v2)` from Keycloak. If you want to use this provider, you need to enable
+the old Admin UI for the respective realm (mostly `master`, see this
+paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-released.html#_new_admin_console_is_now_the_default_console))
 
 ## Installation
 
-1. Make sure you have a copy of the latest [JAR](https://github.com/klausbetz/apple-identity-provider-keycloak/releases/latest) of this provider package.
+1. Make sure you have a copy of the latest [JAR](https://github.com/klausbetz/apple-identity-provider-keycloak/releases/latest) of this
+   provider package.
 2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` if you use docker; alternatively see
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
 3. Keycloak might need a restart (or a whole new container when using docker)
@@ -36,7 +39,7 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 | Team ID        | Your Team ID obtained from your Apple developer account.                                                                                                                                                        |
 | Key ID         | A key identifier obtained from your Apple developer account.                                                                                                                                                    |
 | p8 Key         | Raw content of p8 key file you get from your Apple developer account.                                                                                                                                           |
-| Default Scopes | Scopes to request from Apple (for web-based logins). defaults to `openid%20name%20email`                                                                                                                        |
+| Default Scopes | Scopes to request from Apple (for web-based logins). defaults to `openid name email`                                                                                                                            |
 
 :warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
 URLs in your Apple developer account.
