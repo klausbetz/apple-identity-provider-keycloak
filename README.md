@@ -47,8 +47,16 @@ URLs in your Apple developer account.
 ## Token exchange
 
 Token exchange can be used to trade an Apple `authorizationCode` for Keycloak access- and refresh-tokens.  
-Following endpoint might be interesting for native apple sign on on e.g. iOS devices.
+This flow is mostly interesting for native applications like iOS apps, to provide native login options.
 
+### How it works
+
+![token exchange](docs/token_exchange.png)
+
+### Details
+
+Looking at `3` from the image above, you want to use the `/token` endpoint of your realm to exchange an Apple `authorizationCode` for
+Keycloak tokens.  
 `<keycloak server url>/realms/<realm>/protocol/openid-connect/token`  
 `application/x-www-form-urlencoded`
 
@@ -56,7 +64,7 @@ Following endpoint might be interesting for native apple sign on on e.g. iOS dev
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `client_id`       | the client id of your Keycloak client                                                                                                                                                                                                                     |
 | `grant_type`      | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                         |
-| `subject_token`   | authorizationCode from Apple                                                                                                                                                                                                                              |
+| `subject_token`   | `authorizationCode` from Apple                                                                                                                                                                                                                              |
 | `subject_issuer`  | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                     |
 | `user_profile`    | `{ "name": { "firstName": string, "lastName": string }, "email": string }` the JSON string that Apple sends on the first login (only required for the first login)                                                                                        |
 | `app_identifier`  | In case the configured Service ID doesn't match the app identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and app_identifier is used instead (Apple might throw a client_id mismatch exception if not provided) |
