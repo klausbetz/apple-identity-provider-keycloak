@@ -58,7 +58,7 @@ public class AppleIdentityProviderEndpoint {
 
     @POST
     public Response authResponse(@FormParam(OAUTH2_PARAMETER_STATE) String state, @FormParam(OAUTH2_PARAMETER_CODE) String authorizationCode, @FormParam(OAUTH2_PARAMETER_USER) String user, @FormParam(OAuth2Constants.ERROR) String error) {
-        IdentityBrokerState idpState = IdentityBrokerState.encoded(state);
+        IdentityBrokerState idpState = IdentityBrokerState.encoded(state, realm);
         String clientId = idpState.getClientId();
         String tabId = idpState.getTabId();
 
