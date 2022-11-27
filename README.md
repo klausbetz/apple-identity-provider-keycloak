@@ -16,7 +16,7 @@ compatible to Keycloak. Differences are as follows:
 
 ## General
 
-This extension was tested with Keycloak 19.0 using docker.  
+This extension was tested with Keycloak `20.0.1` using docker.  
 :warning: It's not yet compatible to the new `Admin UI (keycloak.v2)` from Keycloak. If you want to use this provider, you need to enable
 the old Admin UI for the respective realm (mostly `master`, see this
 paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-released.html#_new_admin_console_is_now_the_default_console))
@@ -28,6 +28,17 @@ paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-r
 2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` if you use docker; alternatively see
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
 3. Keycloak might need a restart (or a whole new container when using docker)
+
+## Compatibility
+
+Since this package implements internal Keycloak SPIs, there's a chance this extension breaks with a new major version of Keycloak.  
+See compatibility list below to find the version that suits your Keycloak version.
+
+| Keycloak Version   | Extension Version                 |
+|--------------------|-----------------------------------|
+| `< 17.0.0`         | Not tested. Use at your own risk. |
+| `17.0.0 <= 19.0.3` | `1.2.0`                           |
+| `>= 20.0.0`        | `1.3.0`                           |
 
 ## Configuration
 
@@ -64,7 +75,7 @@ Keycloak tokens.
 |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `client_id`       | the client id of your Keycloak client                                                                                                                                                                                                                     |
 | `grant_type`      | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                         |
-| `subject_token`   | `authorizationCode` from Apple                                                                                                                                                                                                                              |
+| `subject_token`   | `authorizationCode` from Apple                                                                                                                                                                                                                            |
 | `subject_issuer`  | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                     |
 | `user_profile`    | `{ "name": { "firstName": string, "lastName": string }, "email": string }` the JSON string that Apple sends on the first login (only required for the first login)                                                                                        |
 | `app_identifier`  | In case the configured Service ID doesn't match the app identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and app_identifier is used instead (Apple might throw a client_id mismatch exception if not provided) |

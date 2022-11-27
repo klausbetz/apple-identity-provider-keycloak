@@ -2,7 +2,6 @@ package at.klausbetz.provider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.OAuthErrorException;
@@ -39,8 +38,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 public class AppleIdentityProvider extends OIDCIdentityProvider implements SocialIdentityProvider<OIDCIdentityProviderConfig> {
@@ -53,8 +50,6 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     private static final String ISSUER = "https://appleid.apple.com";
     static final String APPLE_AUTHZ_CODE = "apple-authz-code";
 
-    private static final Provider BOUNCY_CASTLE_PROVIDER = new BouncyCastleProvider();
-
     @Context
     private ClientConnection clientConnection;
 
@@ -65,10 +60,6 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         config.setTokenUrl(TOKEN_URL);
         config.setClientAuthMethod(OIDCLoginProtocol.CLIENT_SECRET_POST);
         config.setIssuer(ISSUER);
-
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(BOUNCY_CASTLE_PROVIDER);
-        }
     }
 
     @Override
