@@ -47,6 +47,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     private static final Logger logger = Logger.getLogger(AppleIdentityProvider.class);
     private static final String AUTH_URL = "https://appleid.apple.com/auth/authorize?response_mode=form_post";
     private static final String TOKEN_URL = "https://appleid.apple.com/auth/token";
+    private static final String JWKS_URL = "https://appleid.apple.com/auth/keys";
     private static final String ISSUER = "https://appleid.apple.com";
     static final String APPLE_AUTHZ_CODE = "apple-authz-code";
 
@@ -58,6 +59,9 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
         config.setAuthorizationUrl(AUTH_URL);
         config.setTokenUrl(TOKEN_URL);
+        config.setJwksUrl(JWKS_URL);
+        config.setValidateSignature(true);
+        config.setUseJwksUrl(true);
         config.setClientAuthMethod(OIDCLoginProtocol.CLIENT_SECRET_POST);
         config.setIssuer(ISSUER);
     }
@@ -87,7 +91,8 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         }
 
         if (OAuth2Constants.JWT_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType()) || OAuth2Constants.ID_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType())) {
-            return validateJwt(event, exchangeParams.getSubjectToken(), exchangeParams.getSubjectTokenType());
+            var context = validateJwt(event, exchangeParams.getSubjectToken(), exchangeParams.getSubjectTokenType());
+            return exchangeParams.getUserJson() != null ? handleUserJson(context, exchangeParams.getUserJson()) : context;
         } else if (APPLE_AUTHZ_CODE.equals(exchangeParams.getSubjectTokenType())) {
             return exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier());
         } else {
@@ -127,20 +132,10 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         BrokeredIdentityContext user = AppleIdentityProvider.this.getFederatedIdentity(response);
 
         if (userData != null) {
-            JsonNode profile = mapper.readTree(userData);
-            JsonNode nameNode = profile.get("name");
-            if (nameNode != null) {
-                JsonNode firstNameNode = nameNode.get("firstName");
-                if (firstNameNode != null) {
-                    user.setFirstName(firstNameNode.asText());
-                }
-                JsonNode lastNameNode = nameNode.get("lastName");
-                if (lastNameNode != null) {
-                    user.setLastName(lastNameNode.asText());
-                }
-            }
-
-            AbstractJsonUserAttributeMapper.storeUserProfileForMapper(user, profile, getConfig().getAlias());
+            AppleUserRepresentation appleUser = parseUser(userData);
+            user.setFirstName(appleUser.getFirstName());
+            user.setLastName(appleUser.getLastName());
+            AbstractJsonUserAttributeMapper.storeUserProfileForMapper(user, appleUser.getProfile(), getConfig().getAlias());
         }
 
         return user;
@@ -168,10 +163,10 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.decode(
                     p8Content
-                            .replaceAll("-----BEGIN PRIVATE KEY-----", "")
-                            .replaceAll("-----END PRIVATE KEY-----", "")
-                            .replaceAll("\\n", "")
-                            .replaceAll(" ", "")
+                            .replace("-----BEGIN PRIVATE KEY-----", "")
+                            .replace("-----END PRIVATE KEY-----", "")
+                            .replace("\\n", "")
+                            .replace(" ", "")
             ));
             PrivateKey privateKey = kf.generatePrivate(keySpecPKCS8);
             KeyWrapper keyWrapper = new KeyWrapper();
@@ -220,5 +215,39 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             logger.warn("Error exchanging apple authorization_code. clientId=" + clientId, e);
             return null;
         }
+    }
+
+    private BrokeredIdentityContext handleUserJson(BrokeredIdentityContext context, String userJson) {
+        try {
+            AppleUserRepresentation appleUser = parseUser(userJson);
+            if (appleUser.getFirstName() != null && (context.getFirstName() == null || context.getFirstName().isBlank())) {
+                context.setFirstName(appleUser.getFirstName());
+            }
+            if (appleUser.getLastName() != null && (context.getLastName() == null || context.getLastName().isBlank())) {
+                context.setLastName(appleUser.getLastName());
+            }
+        } catch (Exception e) {
+            // do nothing
+        }
+        return context;
+    }
+
+    private AppleUserRepresentation parseUser(String userJson) throws JsonProcessingException {
+        JsonNode profile = mapper.readTree(userJson);
+        JsonNode nameNode = profile.get("name");
+        AppleUserRepresentation appleUser = new AppleUserRepresentation();
+        appleUser.setProfile(profile);
+        if (nameNode != null) {
+            JsonNode firstNameNode = nameNode.get("firstName");
+            if (firstNameNode != null) {
+                appleUser.setFirstName(firstNameNode.asText());
+            }
+            JsonNode lastNameNode = nameNode.get("lastName");
+            if (lastNameNode != null) {
+                appleUser.setLastName(lastNameNode.asText());
+            }
+        }
+
+        return appleUser;
     }
 }

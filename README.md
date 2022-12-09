@@ -38,7 +38,7 @@ See compatibility list below to find the version that suits your Keycloak versio
 |--------------------|-----------------------------------|
 | `< 17.0.0`         | Not tested. Use at your own risk. |
 | `17.0.0 <= 19.0.3` | `1.2.0`                           |
-| `>= 20.0.0`        | `1.3.0`                           |
+| `>= 20.0.0`        | `>= 1.3.0`                        |
 
 ## Configuration
 
@@ -57,25 +57,40 @@ URLs in your Apple developer account.
 
 ## Token exchange
 
-Token exchange can be used to trade an Apple `authorizationCode` for Keycloak access- and refresh-tokens.  
+Token exchange can be used to trade Apple tokens for Keycloak access- and refresh-tokens.  
 This flow is mostly interesting for native applications like iOS apps, to provide native login options.
 
-### How it works
+### 1. Using Apple ID-Token (recommended)
+
+You want to use the `/token` endpoint of your realm to exchange an Apple ID-Token for Keycloak tokens.  
+`<keycloak server url>/realms/<realm>/protocol/openid-connect/token`  
+`application/x-www-form-urlencoded`
+
+| Parameter            | Description                                                                                                                                                                                                       |
+|----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `client_id`          | the client id of your Keycloak client                                                                                                                                                                             |
+| `grant_type`         | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                 |
+| `subject_token`      | ID-Token from Apple                                                                                                                                                                                               |
+| `subject_issuer`     | `apple` (the name of the social provider in keycloak)                                                                                                                                                             |
+| `subject_token_type` | `urn:ietf:params:oauth:token-type:id_token`                                                                                                                                                                       |
+| `user_profile`       | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login if you want to store the user's name) |
+
+### 2. Using Apple `authorization_code`
 
 ![token exchange](docs/token_exchange.png)
 
-### Details
+#### Details
 
 Looking at `3` from the image above, you want to use the `/token` endpoint of your realm to exchange an Apple `authorizationCode` for
 Keycloak tokens.  
 `<keycloak server url>/realms/<realm>/protocol/openid-connect/token`  
 `application/x-www-form-urlencoded`
 
-| Parameter         | Description                                                                                                                                                                                                                                               |
-|-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `client_id`       | the client id of your Keycloak client                                                                                                                                                                                                                     |
-| `grant_type`      | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                         |
-| `subject_token`   | `authorizationCode` from Apple                                                                                                                                                                                                                            |
-| `subject_issuer`  | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                     |
-| `user_profile`    | `{ "name": { "firstName": string, "lastName": string }, "email": string }` the JSON string that Apple sends on the first login (only required for the first login)                                                                                        |
-| `app_identifier`  | In case the configured Service ID doesn't match the app identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and app_identifier is used instead (Apple might throw a client_id mismatch exception if not provided) |
+| Parameter        | Description                                                                                                                                                                                                                                               |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `client_id`      | the client id of your Keycloak client                                                                                                                                                                                                                     |
+| `grant_type`     | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                         |
+| `subject_token`  | `authorizationCode` from Apple                                                                                                                                                                                                                            |
+| `subject_issuer` | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                     |
+| `user_profile`   | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name)                                        |
+| `app_identifier` | In case the configured Service ID doesn't match the app identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and app_identifier is used instead (Apple might throw a client_id mismatch exception if not provided) |
