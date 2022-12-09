@@ -57,7 +57,7 @@ URLs in your Apple developer account.
 
 ## Token exchange
 
-Token exchange can be used to trade an Apple `authorizationCode` for Keycloak access- and refresh-tokens.  
+Token exchange can be used to trade Apple tokens for Keycloak access- and refresh-tokens.  
 This flow is mostly interesting for native applications like iOS apps, to provide native login options.
 
 ### 1. Using Apple ID-Token (recommended)
