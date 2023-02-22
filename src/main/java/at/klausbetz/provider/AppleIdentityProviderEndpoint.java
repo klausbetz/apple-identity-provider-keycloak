@@ -10,11 +10,9 @@ import org.keycloak.common.ClientConnection;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
-import org.keycloak.models.ClientModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.ErrorPage;
-import org.keycloak.services.managers.ClientSessionCode;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
@@ -34,6 +32,7 @@ public class AppleIdentityProviderEndpoint {
     private static final String OAUTH2_PARAMETER_STATE = "state";
     private static final String OAUTH2_PARAMETER_USER = "user";
     private static final String ACCESS_DENIED = "access_denied";
+    private static final String USER_CANCELLED_AUTHORIZE = "user_cancelled_authorize";
 
     private final AppleIdentityProvider appleIdentityProvider;
     private final RealmModel realm;
@@ -58,19 +57,24 @@ public class AppleIdentityProviderEndpoint {
 
     @POST
     public Response authResponse(@FormParam(OAUTH2_PARAMETER_STATE) String state, @FormParam(OAUTH2_PARAMETER_CODE) String authorizationCode, @FormParam(OAUTH2_PARAMETER_USER) String user, @FormParam(OAuth2Constants.ERROR) String error) {
+        if (state == null) {
+            return errorIdentityProviderLogin(Messages.IDENTITY_PROVIDER_MISSING_STATE_ERROR);
+        }
+
         IdentityBrokerState idpState = IdentityBrokerState.encoded(state, realm);
         String clientId = idpState.getClientId();
         String tabId = idpState.getTabId();
-
         if (clientId == null || tabId == null) {
             logger.errorf("Invalid state parameter: %s", state);
-            event.event(EventType.LOGIN);
-            event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
-            return ErrorPage.error(session, null, Response.Status.BAD_REQUEST, Messages.INVALID_REQUEST);
+            return errorIdentityProviderLogin(Messages.INVALID_REQUEST, Response.Status.BAD_REQUEST);
         }
+
+        AuthenticationSessionModel authSession = this.callback.getAndVerifyAuthenticationSession(state);
+        session.getContext().setAuthenticationSession(authSession);
+
         if (error != null) {
-            logger.error(error + " for broker login " + appleIdentityProvider.getConfig().getProviderId());
-            if (error.equals(ACCESS_DENIED)) {
+            logger.warn(error + " for broker login " + appleIdentityProvider.getConfig().getProviderId());
+            if (error.equals(ACCESS_DENIED) || error.equals(USER_CANCELLED_AUTHORIZE)) {
                 return callback.cancelled();
             } else if (error.equals(OAuthErrorException.LOGIN_REQUIRED) || error.equals(OAuthErrorException.INTERACTION_REQUIRED)) {
                 return callback.error(error);
@@ -78,9 +82,6 @@ public class AppleIdentityProviderEndpoint {
                 return callback.error(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
             }
         }
-
-        ClientModel client = realm.getClientByClientId(clientId);
-        AuthenticationSessionModel authSession = ClientSessionCode.getClientSession(state, tabId, session, realm, client, event, AuthenticationSessionModel.class);
 
         try {
             if (authorizationCode != null) {
@@ -93,8 +94,16 @@ public class AppleIdentityProviderEndpoint {
         } catch (Exception e) {
             logger.error("Failed to complete apple identity provider oauth callback", e);
         }
-        event.event(EventType.LOGIN);
+        return errorIdentityProviderLogin(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    }
+
+    private Response errorIdentityProviderLogin(String message) {
+        return errorIdentityProviderLogin(message, Response.Status.BAD_GATEWAY);
+    }
+
+    private Response errorIdentityProviderLogin(String message, Response.Status status) {
+        event.event(EventType.IDENTITY_PROVIDER_LOGIN);
         event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
-        return ErrorPage.error(session, null, Response.Status.BAD_GATEWAY, Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+        return ErrorPage.error(session, null, status, message);
     }
 }
