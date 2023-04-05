@@ -1,25 +1,49 @@
 plugins {
     id 'java'
+    id 'maven-publish'
 }
 
 group 'at.klausbetz'
 version '1.6.0'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
+ext {
+    keycloakVersion = '21.1.0'
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly 'org.keycloak:keycloak-core:21.1.0'
-    compileOnly 'org.keycloak:keycloak-server-spi:21.1.0'
-    compileOnly 'org.keycloak:keycloak-server-spi-private:21.1.0'
-    compileOnly 'org.keycloak:keycloak-services:21.1.0'
+    compileOnly "org.keycloak:keycloak-core:$keycloakVersion"
+    compileOnly "org.keycloak:keycloak-server-spi:$keycloakVersion"
+    compileOnly "org.keycloak:keycloak-server-spi-private:$keycloakVersion"
+    compileOnly "org.keycloak:keycloak-services:$keycloakVersion"
 
-    testImplementation 'org.keycloak:keycloak-services:21.1.0'
+    testImplementation "org.keycloak:keycloak-services:$keycloakVersion"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+// run 'gradle wrapper' to regenerate gradle/ folder
+wrapper {
+    gradleVersion = "8.0.2"
+    distributionType = Wrapper.DistributionType.BIN
 }

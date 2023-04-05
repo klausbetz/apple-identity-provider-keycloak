@@ -30,7 +30,8 @@ paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-r
 ## Installation
 
 1. Make sure you have a copy of the latest [JAR](https://github.com/klausbetz/apple-identity-provider-keycloak/releases/latest) of this
-   provider package.
+   provider package or include it as a Maven dependency <a href="https://jitpack.io/#klausbetz/apple-identity-provider-keycloak">
+   <img src="https://jitpack.io/v/klausbetz/apple-identity-provider-keycloak.svg" alt="Release"></a>.
 2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` if you use docker; alternatively see
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
 3. Keycloak might need a restart (or a whole new container when using docker)
@@ -102,3 +103,4 @@ Keycloak tokens.
 | `subject_issuer` | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                     |
 | `user_profile`   | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name)                                        |
 | `app_identifier` | In case the configured Service ID doesn't match the app identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and app_identifier is used instead (Apple might throw a client_id mismatch exception if not provided) |
+
