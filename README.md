@@ -46,6 +46,7 @@ See compatibility list below to find the version that suits your Keycloak versio
 | `17.0.0 <= 19.0.3` | `1.2.0`                           |
 | `20.0.0 <= 20.0.5` | `1.3.0 <= 1.4.1`                  |
 | `21.0.0 <= 21.0.2` | `1.5.0`                           |
+| `>= 21.1.0`        | `>= 1.6.0`                        |
 
 ## Configuration
 

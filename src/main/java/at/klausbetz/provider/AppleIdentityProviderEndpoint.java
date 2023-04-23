@@ -75,7 +75,7 @@ public class AppleIdentityProviderEndpoint {
         if (error != null) {
             logger.warn(error + " for broker login " + appleIdentityProvider.getConfig().getProviderId());
             if (error.equals(ACCESS_DENIED) || error.equals(USER_CANCELLED_AUTHORIZE)) {
-                return callback.cancelled();
+                return callback.cancelled(this.appleIdentityProvider.getConfig());
             } else if (error.equals(OAuthErrorException.LOGIN_REQUIRED) || error.equals(OAuthErrorException.INTERACTION_REQUIRED)) {
                 return callback.error(error);
             } else {
