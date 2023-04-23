@@ -39,20 +39,20 @@ public class AppleIdentityProviderEndpoint {
     private final IdentityProvider.AuthenticationCallback callback;
     private final EventBuilder event;
 
-    @Context
     protected KeycloakSession session;
 
-    @Context
     protected ClientConnection clientConnection;
 
     @Context
     protected HttpHeaders headers;
 
-    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, IdentityProvider.AuthenticationCallback callback, EventBuilder event) {
+    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, IdentityProvider.AuthenticationCallback callback, EventBuilder event, KeycloakSession session, ClientConnection clientConnection) {
         this.appleIdentityProvider = appleIdentityProvider;
         this.realm = realm;
         this.callback = callback;
         this.event = event;
+        this.session = session;
+        this.clientConnection = clientConnection;
     }
 
     @POST

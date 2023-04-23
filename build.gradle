@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'at.klausbetz'
-version '1.4.1'
+version '1.5.0'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
@@ -11,12 +11,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.keycloak:keycloak-core:20.0.1'
-    compileOnly 'org.keycloak:keycloak-server-spi:20.0.1'
-    compileOnly 'org.keycloak:keycloak-server-spi-private:20.0.1'
-    compileOnly 'org.keycloak:keycloak-services:20.0.1'
+    compileOnly 'org.keycloak:keycloak-core:21.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi:21.0.2'
+    compileOnly 'org.keycloak:keycloak-server-spi-private:21.0.2'
+    compileOnly 'org.keycloak:keycloak-services:21.0.2'
 
-    testImplementation 'org.keycloak:keycloak-services:20.0.1'
+    testImplementation 'org.keycloak:keycloak-services:21.0.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
 }
 

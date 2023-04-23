@@ -68,7 +68,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-        return new AppleIdentityProviderEndpoint(this, realm, callback, event);
+        return new AppleIdentityProviderEndpoint(this, realm, callback, event, session, session.getContext().getConnection());
     }
 
     @Override
