@@ -4,8 +4,11 @@ This repository represents an extension for [Keycloak](https://www.keycloak.org)
 enables [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple) for web-based applications and native
 application (via `token-exchange`).
 
-:warning: Since `Keycloak v21.0.0` this extension cannot be used effectively. The old AngularJS-based Admin-UI got removed completely and at least for now there's no way of displaying all necessary configuration options in order to configure this extension properly in Keycloak.  
-For now, the latest version this extension is compatible with is `v20.0.5`.
+:warning: Since `Keycloak v21.0.0` this extension cannot be used effectively. The old AngularJS-based Admin-UI got removed completely and at
+least for now there's no way of displaying all necessary configuration options in order to configure this extension properly in Keycloak.  
+For now, the latest version this extension is compatible with is `v20.0.5`.  
+However, you can still use this extension with Keycloak `> v21.0.0` when you use some sort of external configuration tools like terraform or
+keycloak-config-cli where you do not rely on Keycloak's UI.
 
 ### Apple vs. the rest of the world
 
@@ -41,7 +44,8 @@ See compatibility list below to find the version that suits your Keycloak versio
 |--------------------|-----------------------------------|
 | `< 17.0.0`         | Not tested. Use at your own risk. |
 | `17.0.0 <= 19.0.3` | `1.2.0`                           |
-| `>= 20.0.0`        | `>= 1.3.0`                        |
+| `20.0.0 <= 20.0.5` | `1.3.0 <= 1.4.1`                  |
+| `21.0.0 <= 21.0.2` | `1.5.0`                           |
 
 ## Configuration
 
