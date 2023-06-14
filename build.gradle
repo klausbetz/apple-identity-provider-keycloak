@@ -35,9 +35,19 @@ java {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/TongLeC/apple-identity-provider-keycloak") // Replace OWNER and REPOSITORY with your details.
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
     publications {
-        maven(MavenPublication) {
-            from components.java
+        gpr(MavenPublication) {
+            from(components["java"])
         }
     }
 }
