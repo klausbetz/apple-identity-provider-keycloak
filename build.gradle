@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group 'at.klausbetz'
+group 'com.tonglec'
 version '1.6.0'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
@@ -38,7 +38,7 @@ publishing {
     repositories {
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/TongLeC/apple-identity-provider-keycloak") // Replace OWNER and REPOSITORY with your details.
+            url = uri("https://maven.pkg.github.com/TongLeC/apple-identity-provider-keycloak")
             credentials {
                 username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
                 password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
