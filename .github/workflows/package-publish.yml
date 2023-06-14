@@ -2,7 +2,7 @@ name: Build and Publish Jar
 
 on:
   push:
-    branches: [ test ] # the action will trigger when you push to the main branch
+    branches: [ test ]
 
 jobs:
   build-and-publish:
@@ -23,8 +23,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew build
+      #- name: Build with Gradle
+      #  run: ./gradlew build
+
+      - name: Build JAR archive
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: jar
 
       - name: Publish to GitHub Packages
         run: ./gradlew publish
