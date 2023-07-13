@@ -19,9 +19,9 @@ compatible to Keycloak. Differences are as follows:
 1. Make sure you have a copy of the latest [JAR](https://github.com/klausbetz/apple-identity-provider-keycloak/releases/latest) of this
    provider package or include it as a Maven dependency <a href="https://jitpack.io/#klausbetz/apple-identity-provider-keycloak">
    <img src="https://jitpack.io/v/klausbetz/apple-identity-provider-keycloak.svg" alt="Release"></a>.
-2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` if you use docker; alternatively see
+2. Deploy the JAR file to keycloak (by placing it in `/opt/keycloak/providers` inside your docker container; alternatively see
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
-3. Keycloak might need a restart (or a whole new container when using docker)
+3. Keycloak might need a restart (or a fresh container when using docker)
 
 ## Compatibility
 
@@ -37,12 +37,13 @@ See compatibility list below to find the version that suits your Keycloak versio
 | `21.1.0 <= 21.1.2` | `1.6.0`                           |
 | `>= 22.0.0`        | `>= 1.7.0`                        |
 
-:information: In Keycloak `v21.X.Y` this extension cannot be used effectively, since the additional properties such as `Team ID`, `Key ID`
+:information_source: In Keycloak `v21.X.Y` this extension cannot be used effectively, since the additional properties such
+as `Team ID`, `Key ID`
 and so on are not displayed in the Admin UI.   
 However, you can still use this extension with Keycloak `v21.X.Y` when you use some sort of external configuration tools like terraform or
 [keycloak-config-cli](https://github.com/adorsys/keycloak-config-cli) where you do not rely on Keycloak's UI.
 
-:information: For Keycloak `v19` and `v20` you have to switch to the old Admin UI to use this extension (see this
+:information_source: For Keycloak `v19` and `v20` you have to switch to the old Admin UI to use this extension (see this
 paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-released.html#_new_admin_console_is_now_the_default_console))
 
 ## Configuration
