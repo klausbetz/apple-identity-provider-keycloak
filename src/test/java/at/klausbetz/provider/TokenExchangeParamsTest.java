@@ -1,8 +1,7 @@
 package at.klausbetz.provider;
 
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.junit.jupiter.api.Test;
-
-import javax.ws.rs.core.MultivaluedMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

@@ -1,9 +1,9 @@
 package at.klausbetz.provider;
 
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.keycloak.OAuth2Constants;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
 import java.util.Collections;
 import java.util.List;
 
