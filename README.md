@@ -23,6 +23,8 @@ compatible to Keycloak. Differences are as follows:
    this [guide](https://www.keycloak.org/docs/latest/server_development/index.html#registering-provider-implementations))
 3. Keycloak might need a restart (or a fresh container when using docker)
 
+See a [`Dockerfile` example](docs/README_docker_installation.md).
+
 ## Compatibility
 
 Since this package implements internal Keycloak SPIs, there's a chance this extension breaks with a new major version of Keycloak.  
