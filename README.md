@@ -52,14 +52,14 @@ paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-r
 
 Log into your Keycloak admin console and add `Apple` as new `Identity Provider` and get comfortable with the configuration options:
 
-| Option                   | Description                                                                                                                                                                                                                                        |
-|--------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Client ID (= Service ID) | For web-clients this is usually the corresponding Service ID from Apple. <br>For native clients (like iOS Apps), which just perform a token-exchange using `authorization_code`, this should be the bundle-identifier of the consuming native app. |
-| Client Secret            | (Ignored) Just use a dummy value.                                                                                                                                                                                                                  |
-| Team ID                  | Your Team ID obtained from your Apple developer account.                                                                                                                                                                                           |
-| Key ID                   | A key identifier obtained from your Apple developer account.                                                                                                                                                                                       |
-| p8 Key                   | Raw content of p8 key file you get from your Apple developer account.                                                                                                                                                                              |
-| Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email`                                                                                                                                                                    |
+| Option                   | Description                                                                     |
+|--------------------------|---------------------------------------------------------------------------------|
+| Client ID (= Service ID) | For web-clients this is usually the corresponding Service ID from Apple.        |
+| Client Secret            | (Ignored) Just use a dummy value.                                               |
+| Team ID                  | Your Team ID obtained from your Apple developer account.                        |
+| Key ID                   | A key identifier obtained from your Apple developer account.                    |
+| p8 Key                   | Raw content of p8 key file you get from your Apple developer account.           |
+| Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email` |
 
 :raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out this [guide](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple#how-sign-in-with-apple-works-hint-it-uses-oauth-and-oidc).
 
