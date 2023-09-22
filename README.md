@@ -54,17 +54,17 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 
 | Option                   | Description                                                                     |
 |--------------------------|---------------------------------------------------------------------------------|
-| Client ID (= Service ID) | For web-clients this is usually the corresponding Service ID from Apple.        |
+| Client ID (= Service ID) | Your Service ID from your Apple Developer Account.        |
 | Client Secret            | (Ignored) Just use a dummy value.                                               |
-| Team ID                  | Your Team ID obtained from your Apple developer account.                        |
-| Key ID                   | A key identifier obtained from your Apple developer account.                    |
-| p8 Key                   | Raw content of p8 key file you get from your Apple developer account.           |
+| Team ID                  | Your Team ID obtained from your Apple Developer Account.                        |
+| Key ID                   | A key identifier obtained from your Apple Developer Account.                    |
+| p8 Key                   | Raw content of p8 key file you get from your Apple Developer Account.           |
 | Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email` |
 
 :raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out this [guide](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple#how-sign-in-with-apple-works-hint-it-uses-oauth-and-oidc).
 
 :warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
-URLs in your Apple developer account.
+URLs in your Apple Developer Account.
 
 ## Token exchange
 
