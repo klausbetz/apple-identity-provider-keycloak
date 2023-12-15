@@ -2,7 +2,6 @@ package at.klausbetz.provider;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
@@ -14,7 +13,6 @@ import org.keycloak.broker.oidc.mappers.AbstractJsonUserAttributeMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.broker.social.SocialIdentityProvider;
-import org.keycloak.common.ClientConnection;
 import org.keycloak.common.util.Base64;
 import org.keycloak.common.util.Time;
 import org.keycloak.crypto.KeyWrapper;
@@ -51,9 +49,6 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     private static final String ISSUER = "https://appleid.apple.com";
     static final String APPLE_AUTHZ_CODE = "apple-authz-code";
 
-    @Context
-    private ClientConnection clientConnection;
-
     public AppleIdentityProvider(KeycloakSession session, AppleIdentityProviderConfig config) {
         super(session, config);
 
@@ -68,7 +63,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
     @Override
     public Object callback(RealmModel realm, AuthenticationCallback callback, EventBuilder event) {
-        return new AppleIdentityProviderEndpoint(this, realm, callback, event, session, session.getContext().getConnection());
+        return new AppleIdentityProviderEndpoint(this, realm, callback, event, session);
     }
 
     @Override

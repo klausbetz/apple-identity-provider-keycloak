@@ -3,8 +3,6 @@ package at.klausbetz.provider;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
@@ -12,7 +10,6 @@ import org.keycloak.OAuthErrorException;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.IdentityProvider;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
-import org.keycloak.common.ClientConnection;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
@@ -40,18 +37,12 @@ public class AppleIdentityProviderEndpoint {
 
     protected KeycloakSession session;
 
-    protected ClientConnection clientConnection;
-
-    @Context
-    protected HttpHeaders headers;
-
-    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, IdentityProvider.AuthenticationCallback callback, EventBuilder event, KeycloakSession session, ClientConnection clientConnection) {
+    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, IdentityProvider.AuthenticationCallback callback, EventBuilder event, KeycloakSession session) {
         this.appleIdentityProvider = appleIdentityProvider;
         this.realm = realm;
         this.callback = callback;
         this.event = event;
         this.session = session;
-        this.clientConnection = clientConnection;
     }
 
     @POST
@@ -74,6 +65,7 @@ public class AppleIdentityProviderEndpoint {
         if (error != null) {
             logger.warn(error + " for broker login " + appleIdentityProvider.getConfig().getProviderId());
             if (error.equals(ACCESS_DENIED) || error.equals(USER_CANCELLED_AUTHORIZE)) {
+                sendErrorEvent();
                 return callback.cancelled(this.appleIdentityProvider.getConfig());
             } else if (error.equals(OAuthErrorException.LOGIN_REQUIRED) || error.equals(OAuthErrorException.INTERACTION_REQUIRED)) {
                 return callback.error(error);
@@ -101,8 +93,13 @@ public class AppleIdentityProviderEndpoint {
     }
 
     private Response errorIdentityProviderLogin(String message, Response.Status status) {
-        event.event(EventType.IDENTITY_PROVIDER_LOGIN);
-        event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
+        sendErrorEvent();
         return ErrorPage.error(session, null, status, message);
+    }
+
+    private void sendErrorEvent() {
+        event.event(EventType.IDENTITY_PROVIDER_LOGIN);
+        event.detail("idp", appleIdentityProvider.getConfig().getProviderId());
+        event.error(Errors.IDENTITY_PROVIDER_LOGIN_FAILURE);
     }
 }
