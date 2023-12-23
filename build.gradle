@@ -8,7 +8,7 @@ version '1.8.0'
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 ext {
-    keycloakVersion = '22.0.2'
+    keycloakVersion = '23.0.3'
 }
 
 repositories {
