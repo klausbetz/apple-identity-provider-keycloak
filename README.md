@@ -30,14 +30,15 @@ See a [`Dockerfile` example](docs/README_docker_installation.md).
 Since this package implements internal Keycloak SPIs, there's a chance this extension breaks with a new major version of Keycloak.  
 See compatibility list below to find the version that suits your Keycloak version.
 
-| Keycloak Version   | Extension Version                 |
-|--------------------|-----------------------------------|
-| `< 17.0.0`         | Not tested. Use at your own risk. |
-| `17.0.0 <= 19.0.3` | `1.2.0`                           |
-| `20.0.0 <= 20.0.5` | `1.3.0 <= 1.4.1`                  |
-| `21.0.0 <= 21.0.2` | `1.5.0`                           |
-| `21.1.0 <= 21.1.2` | `1.6.0`                           |
-| `>= 22.0.0`        | `>= 1.7.0`                        |
+| Keycloak Version                        | Extension Version                 |
+|-----------------------------------------|-----------------------------------|
+| `< 17.0.0`                              | Not tested. Use at your own risk. |
+| `17.0.0 <= 19.0.3`                      | `1.2.0`                           |
+| `20.0.0 <= 20.0.5` :information_source: | `1.3.0 <= 1.4.1`                  |
+| `21.0.0 <= 21.0.2`                      | `1.5.0`                           |
+| `21.1.0 <= 21.1.2`                      | `1.6.0`                           |
+| `22.0.0 < 23.0.0`                       | `1.7.0 <= 1.8.0`                  |
+| `>= 23.0.0`                             | `>= 1.9.0`                        |
 
 :information_source: In Keycloak `v21.X.Y` this extension cannot be used effectively, since the additional properties such
 as `Team ID`, `Key ID`
@@ -54,14 +55,15 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 
 | Option                   | Description                                                                     |
 |--------------------------|---------------------------------------------------------------------------------|
-| Client ID (= Service ID) | Your Service ID from your Apple Developer Account.        |
+| Client ID (= Service ID) | Your Service ID from your Apple Developer Account.                              |
 | Client Secret            | (Ignored) Just use a dummy value.                                               |
 | Team ID                  | Your Team ID obtained from your Apple Developer Account.                        |
 | Key ID                   | A key identifier obtained from your Apple Developer Account.                    |
 | p8 Key                   | Raw content of p8 key file you get from your Apple Developer Account.           |
 | Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email` |
 
-:raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out this [guide](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple#how-sign-in-with-apple-works-hint-it-uses-oauth-and-oidc).
+:raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out
+this [guide](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple#how-sign-in-with-apple-works-hint-it-uses-oauth-and-oidc).
 
 :warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
 URLs in your Apple Developer Account.
@@ -97,12 +99,12 @@ Keycloak tokens.
 `<keycloak server url>/realms/<realm>/protocol/openid-connect/token`  
 `application/x-www-form-urlencoded`
 
-| Parameter        | Description                                                                                                                                                                                                                                                    |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `client_id`      | the client id of your Keycloak client                                                                                                                                                                                                                          |
-| `grant_type`     | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                              |
-| `subject_token`  | `authorizationCode` from Apple                                                                                                                                                                                                                                 |
-| `subject_issuer` | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                          |
-| `user_profile`   | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name)                                             |
+| Parameter        | Description                                                                                                                                                                                                                                                                                                                                              |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `client_id`      | the client id of your Keycloak client                                                                                                                                                                                                                                                                                                                    |
+| `grant_type`     | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                                                                                                                                                        |
+| `subject_token`  | `authorizationCode` from Apple                                                                                                                                                                                                                                                                                                                           |
+| `subject_issuer` | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                                                                                                                    |
+| `user_profile`   | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name)                                                                                                                                       |
 | `app_identifier` | In case the configured Service ID doesn't match the bundle-identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and `app_identifier` is used instead (Apple might throw a client_id mismatch exception if not provided).<br>If the Service ID already matches your bundle-identifier you can omit this parameter. |
 
