@@ -70,6 +70,8 @@ URLs in your Apple Developer Account.
 
 ## Token exchange
 
+:point_right: If you are unsure whether you need token-exchange or not, check out the [wiki](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/Do-you-need-token%E2%80%90exchange%3F).
+
 Token exchange can be used to trade Apple tokens for Keycloak access- and refresh-tokens.  
 This flow is mostly interesting for native applications like iOS apps, to provide native login options.
 
