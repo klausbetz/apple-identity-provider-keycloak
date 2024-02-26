@@ -14,6 +14,6 @@ public class AppleUserAttributeMapper extends UserAttributeMapper {
 
     @Override
     public String getId() {
-            return "apple-user-attribute-mapper";
-        }
+        return "apple-user-attribute-mapper";
+    }
 }
