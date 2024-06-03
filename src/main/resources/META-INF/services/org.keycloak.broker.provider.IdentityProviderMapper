@@ -1,2 +1,4 @@
-at.klausbetz.provider.AppleUsernameTemplateMapper
+at.klausbetz.provider.AppleJsonUserAttributeMapper
 at.klausbetz.provider.AppleUserAttributeMapper
+at.klausbetz.provider.AppleUsernameTemplateMapper
+at.klausbetz.provider.AppleUserSessionNoteMapper
