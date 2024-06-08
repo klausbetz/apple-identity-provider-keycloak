@@ -11,6 +11,7 @@ import org.keycloak.broker.oidc.OIDCIdentityProvider;
 import org.keycloak.broker.oidc.OIDCIdentityProviderConfig;
 import org.keycloak.broker.oidc.mappers.AbstractJsonUserAttributeMapper;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
+import org.keycloak.broker.provider.IdentityBrokerException;
 import org.keycloak.broker.provider.util.SimpleHttp;
 import org.keycloak.broker.social.SocialIdentityProvider;
 import org.keycloak.common.util.Base64;
@@ -85,8 +86,8 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "token not set", Response.Status.BAD_REQUEST);
         }
 
-        if (OAuth2Constants.JWT_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType()) || OAuth2Constants.ID_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType())) {
-            var context = validateJwt(event, exchangeParams.getSubjectToken(), exchangeParams.getSubjectTokenType());
+        if (OAuth2Constants.ID_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType())) {
+            var context = validateAppleIdToken(event, exchangeParams.getSubjectToken());
             return exchangeParams.getUserJson() != null ? handleUserJson(context, exchangeParams.getUserJson()) : context;
         } else if (APPLE_AUTHZ_CODE.equals(exchangeParams.getSubjectTokenType())) {
             return exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier());
@@ -94,6 +95,52 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             event.detail(Details.REASON, OAuth2Constants.SUBJECT_TOKEN_TYPE + " invalid");
             event.error(Errors.INVALID_TOKEN_TYPE);
             throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token type", Response.Status.BAD_REQUEST);
+        }
+    }
+
+    // NOTE: slightly modified version of OIDCIdentityProvider.validateJWT
+    private BrokeredIdentityContext validateAppleIdToken(EventBuilder event, String subjectToken) {
+        event.detail("validation_method", "signature");
+        if (getConfig().isUseJwksUrl()) {
+            if (getConfig().getJwksUrl() == null) {
+                event.detail(Details.REASON, "jwks url unset");
+                event.error(Errors.INVALID_CONFIG);
+                throw new ErrorResponseException(Errors.INVALID_CONFIG, "Invalid server config", Response.Status.BAD_REQUEST);
+            }
+        } else if (getConfig().getPublicKeySignatureVerifier() == null) {
+            event.detail(Details.REASON, "public key unset");
+            event.error(Errors.INVALID_CONFIG);
+            throw new ErrorResponseException(Errors.INVALID_CONFIG, "Invalid server config", Response.Status.BAD_REQUEST);
+        }
+
+        JsonWebToken parsedToken;
+        try {
+            parsedToken = validateToken(subjectToken, true);
+        } catch (IdentityBrokerException e) {
+            logger.debug("Unable to validate token for exchange", e);
+            event.detail(Details.REASON, "token validation failure");
+            event.error(Errors.INVALID_TOKEN);
+            throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
+        }
+
+        try {
+            BrokeredIdentityContext context = extractIdentity(null, null, parsedToken);
+            if (context == null) {
+                event.detail(Details.REASON, "Failed to extract identity from token");
+                event.error(Errors.INVALID_TOKEN);
+                throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
+            }
+
+            context.getContextData().put(VALIDATED_ID_TOKEN, parsedToken);
+            context.getContextData().put(EXCHANGE_PROVIDER, getConfig().getAlias());
+            context.setIdp(this);
+            context.setIdpConfig(getConfig());
+            return context;
+        } catch (IOException e) {
+            logger.debug("Unable to extract identity from identity token", e);
+            event.detail(Details.REASON, "Unable to extract identity from identity token: " + e.getMessage());
+            event.error(Errors.INVALID_TOKEN);
+            throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token", Response.Status.BAD_REQUEST);
         }
     }
 
