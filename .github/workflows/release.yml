@@ -1,0 +1,50 @@
+name: Build & release
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+  create-release:
+    name: "Build & release"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+      
+      - name: "Set up JDK 17"
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+      
+      - name: "Build JAR"
+        run: sh gradlew jar
+      
+      - name: "Copy JAR to tmp-artifacts"
+        run: |
+          mkdir tmp-artifacts
+          cp build/libs/*.jar tmp-artifacts
+      
+      - name: "Create hash files"
+        run: |
+          cd tmp-artifacts
+          for jar in *.jar
+          do
+              sha512sum $jar | awk '{ print $1 }' > "${jar}.sha512"
+          done
+          cd ..
+      
+      - name: "Upload artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: Package
+          path: tmp-artifacts
+      
+      - name: "Create release"
+        run: gh release create ${GITHUB_REF_NAME} tmp-artifacts/* --generate-notes --verify-tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
