@@ -134,7 +134,6 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             context.getContextData().put(VALIDATED_ID_TOKEN, parsedToken);
             context.getContextData().put(EXCHANGE_PROVIDER, getConfig().getAlias());
             context.setIdp(this);
-            context.setIdpConfig(getConfig());
             return context;
         } catch (IOException e) {
             logger.debug("Unable to extract identity from identity token", e);
@@ -164,7 +163,6 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         }
 
         BrokeredIdentityContext federatedIdentity = getFederatedIdentity(userDataJson, response.asString());
-        federatedIdentity.setIdpConfig(getConfig());
         federatedIdentity.setIdp(AppleIdentityProvider.this);
         federatedIdentity.setAuthenticationSession(authSession);
         return federatedIdentity;
