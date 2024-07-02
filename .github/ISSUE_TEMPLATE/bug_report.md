@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Describe the bug**
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug is. Which version of Keycloak and the extension do you use?
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
