@@ -1,8 +1,8 @@
 # Apple Identity Provider for Keycloak :apple:
 
 This repository represents an extension for [Keycloak](https://www.keycloak.org), which
-enables [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple) for web-based applications and native
-application (via `token-exchange`).
+enables [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple) for web-based and native
+applications (via `token-exchange`).
 
 ### Apple vs. the rest of the world
 
