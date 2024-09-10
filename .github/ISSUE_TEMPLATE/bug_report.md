@@ -7,8 +7,14 @@ assignees: ''
 
 ---
 
+**Keycloak Version**
+version goes here
+
+**Extension Version**
+version goes here
+
 **Describe the bug**
-A clear and concise description of what the bug is. Which version of Keycloak and the extension do you use?
+A clear and concise description of what the bug is. 
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
