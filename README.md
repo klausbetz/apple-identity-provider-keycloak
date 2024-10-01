@@ -64,7 +64,7 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 | Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email` |
 
 :raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out
-this [guide](https://developer.okta.com/blog/2019/06/04/what-the-heck-is-sign-in-with-apple#how-sign-in-with-apple-works-hint-it-uses-oauth-and-oidc).
+this [guide](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/Configuration-within-Apple-Developer-portal).
 
 :warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
 URLs in your Apple Developer Account.
@@ -109,5 +109,5 @@ Keycloak tokens.
 | `subject_token`  | `authorizationCode` from Apple                                                                                                                                                                                                                                                                                                                           |
 | `subject_issuer` | `apple` (the name of the social provider in keycloak)                                                                                                                                                                                                                                                                                                    |
 | `user_profile`   | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login  if you want to store the user's name)                                                                                                                                       |
-| `app_identifier` | In case the configured Service ID doesn't match the bundle-identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and `app_identifier` is used instead (Apple might throw a client_id mismatch exception if not provided).<br>If the Service ID already matches your bundle-identifier you can omit this parameter. |
+| `app_identifier` | In case the configured Service ID doesn't match the bundle-identifier of the native iOS app, this parameter can be used, so that Service ID is ignored and `app_identifier` is used instead (Apple might throw an invalid_client error if not provided).<br>If the Service ID already matches your bundle-identifier you can omit this parameter. |
 
