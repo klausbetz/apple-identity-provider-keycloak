@@ -1,13 +1,13 @@
 # Running Keycloak and Apple Identity Provider in a container
 
 The following `Dockerfile` creates a pre-configured Keycloak image that enables the health and metrics endpoints, 
-enables the token exchange feature, uses a PostgreSQL database and installs Apple Identity Provider extension:
+enables the token exchange feature and the Fine-Grained Admin Permissions, uses a PostgreSQL database and installs Apple Identity Provider extension:
 
 ```Dockerfile
 FROM quay.io/keycloak/keycloak:22.0.1 as builder
 
 ENV KC_HEALTH_ENABLED=true
-ENV KC_FEATURES=token-exchange
+ENV KC_FEATURES=token-exchange,admin-fine-grained-authz
 ENV KC_DB=postgres
 ENV KC_HTTP_RELATIVE_PATH="/auth"
 
