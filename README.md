@@ -76,6 +76,8 @@ URLs in your Apple Developer Account.
 Token exchange can be used to trade Apple tokens for Keycloak access- and refresh-tokens.  
 This flow is mostly interesting for native applications like iOS apps, to provide native login options.
 
+:point_right: For enabling token-exchange in Keycloak there is some configuration necessary (see [Configure token-exchange](docs/CONFIGURE_TOKEN_EXCHANGE.md))
+
 ### 1. Using Apple ID-Token (recommended)
 
 You want to use the `/token` endpoint of your realm to exchange an Apple ID-Token for Keycloak tokens.  
