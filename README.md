@@ -54,14 +54,14 @@ paper [Keycloak 19.0.0 release](https://www.keycloak.org/2022/07/keycloak-1900-r
 
 Log into your Keycloak admin console and add `Apple` as new `Identity Provider` and get comfortable with the configuration options:
 
-| Option                   | Description                                                                     |
-|--------------------------|---------------------------------------------------------------------------------|
-| Client ID (= Service ID) | Your Service ID from your Apple Developer Account.                              |
-| Client Secret            | (Ignored) Just use a dummy value.                                               |
-| Team ID                  | Your Team ID obtained from your Apple Developer Account.                        |
-| Key ID                   | A key identifier obtained from your Apple Developer Account.                    |
-| p8 Key                   | Raw content of p8 key file you get from your Apple Developer Account.           |
-| Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email` |
+| Option                   | Description                                                                                                       |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------|
+| Client ID (= Service ID) | Your Service ID from your Apple Developer Account.                                                                |
+| Client Secret            | Raw content of p8 key file you get from your Apple Developer Account.                                             |
+| Team ID                  | Your Team ID obtained from your Apple Developer Account.                                                          |
+| Key ID                   | A key identifier obtained from your Apple Developer Account.                                                      |
+| p8 Key                   | (replaced by Client Secret since `v1.14.0`) Raw content of p8 key file you get from your Apple Developer Account. |
+| Default Scopes           | Scopes to request from Apple (for web-based logins). Defaults to `name%20email`                                   |
 
 :raising_hand: If you are unsure where you get these values from your Apple Developer Account you may want to check out
 this [guide](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/Configuration-within-Apple-Developer-portal).
