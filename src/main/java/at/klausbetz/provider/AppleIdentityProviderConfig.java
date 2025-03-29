@@ -7,7 +7,6 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     private static final String TEAM_ID = "teamId";
     private static final String KEY_ID = "keyId";
-    private static final String P8_CONTENT = "p8Content";
     private static final String DISPLAY_ICON_CLASSES = "fa fa-apple";
     private static final String DISPLAY_NAME = "displayName";
     private static final String DEFAULT_DISPLAY_NAME = "Sign in with Apple";
@@ -33,14 +32,6 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     public void setKeyId(String keyId) {
         getConfig().put(KEY_ID, keyId);
-    }
-
-    public String getP8Content() {
-        return getConfig().get(P8_CONTENT);
-    }
-
-    public void setP8Content(String p8Content) {
-        getConfig().put(P8_CONTENT, p8Content);
     }
 
     @Override
