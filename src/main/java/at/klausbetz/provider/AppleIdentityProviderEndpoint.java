@@ -68,9 +68,9 @@ public class AppleIdentityProviderEndpoint {
                 sendErrorEvent();
                 return callback.cancelled(this.appleIdentityProvider.getConfig());
             } else if (error.equals(OAuthErrorException.LOGIN_REQUIRED) || error.equals(OAuthErrorException.INTERACTION_REQUIRED)) {
-                return callback.error(error);
+                return callback.error(appleIdentityProvider.getConfig(), error);
             } else {
-                return callback.error(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+                return callback.error(appleIdentityProvider.getConfig(), Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
             }
         }
 
