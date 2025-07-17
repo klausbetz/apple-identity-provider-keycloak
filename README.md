@@ -25,10 +25,14 @@ compatible to Keycloak. Differences are as follows:
 
 See a [`Dockerfile` example](docs/README_docker_installation.md).
 
+## Upgrading your existing installation
+
+Please refer to [UPGRADE.md](UPGRADE.md). In rare cases, you are required to perform some steps to make the extension work again after an upgrade. 
+
 ## Compatibility
 
 Since this package implements internal Keycloak SPIs, there's a chance this extension breaks with a new major version of Keycloak.  
-See compatibility list below to find the version that suits your Keycloak version.
+See the compatibility list below to find the version that suits your Keycloak version.
 
 | Keycloak Version                        | Extension Version                 |
 |-----------------------------------------|-----------------------------------|
@@ -69,6 +73,10 @@ this [guide](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/
 
 :warning: Make sure to add the keycloak broker-URL (`https://<keycloak-url>/realms/<realm>/broker/apple/endpoint`) to your valid redirect
 URLs in your Apple Developer Account.
+
+## Troubleshooting
+
+Please refer to the [wiki](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/Troubleshooting-the-configuration-from-Apple) to figure out what's wrong.
 
 ## Token exchange
 
