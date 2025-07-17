@@ -39,7 +39,8 @@ See compatibility list below to find the version that suits your Keycloak versio
 | `21.1.0 <= 21.1.2` :information_source: | `1.6.0`                           |
 | `22.0.0 < 23.0.0`                       | `1.7.0 <= 1.8.0`                  |
 | `23.0.0 < 25.0.0`                       | `1.9.0 <= 1.12.0`                 |
-| `>= 25.0.0`                             | `>= 1.13.0`                       |
+| `25.0.0 < 26.2.3`                       | `1.13.0 <= 1.14.0`                |
+| `>= 26.3.0`                             | `>= 1.15.0`                       |
 
 :information_source: In Keycloak `v21.X.Y` this extension cannot be used effectively, since the additional properties such
 as `Team ID`, `Key ID`

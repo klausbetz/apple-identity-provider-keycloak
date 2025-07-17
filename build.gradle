@@ -5,10 +5,10 @@ plugins {
 
 group 'at.klausbetz'
 version '1.14.0'
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 ext {
-    keycloakVersion = '25.0.0'
+    keycloakVersion = '26.3.0'
 }
 
 repositories {

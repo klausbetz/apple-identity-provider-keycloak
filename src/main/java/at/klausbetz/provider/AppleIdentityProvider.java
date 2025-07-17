@@ -78,7 +78,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     }
 
     @Override
-    protected BrokeredIdentityContext exchangeExternalImpl(EventBuilder event, MultivaluedMap<String, String> params) {
+    protected BrokeredIdentityContext exchangeExternalTokenV1Impl(EventBuilder event, MultivaluedMap<String, String> params) {
         TokenExchangeParams exchangeParams = new TokenExchangeParams(params);
         if (exchangeParams.getSubjectToken() == null) {
             event.detail(Details.REASON, OAuth2Constants.SUBJECT_TOKEN + " param unset");
