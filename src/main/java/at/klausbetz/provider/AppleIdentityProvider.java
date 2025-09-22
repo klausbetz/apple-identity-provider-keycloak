@@ -86,17 +86,62 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
             throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "token not set", Response.Status.BAD_REQUEST);
         }
 
+        BrokeredIdentityContext context;
         if (OAuth2Constants.ID_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType())) {
-            var context = validateAppleIdToken(event, exchangeParams.getSubjectToken());
-            return exchangeParams.getUserJson() != null ? handleUserJson(context, exchangeParams.getUserJson()) : context;
+            context = validateAppleIdToken(event, exchangeParams.getSubjectToken());
+            if (exchangeParams.getUserJson() != null) {
+                context = handleUserJson(context, exchangeParams.getUserJson());
+            }
         } else if (APPLE_AUTHZ_CODE.equals(exchangeParams.getSubjectTokenType())) {
-            return exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier());
+            context = exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier());
         } else {
             event.detail(Details.REASON, OAuth2Constants.SUBJECT_TOKEN_TYPE + " invalid");
             event.error(Errors.INVALID_TOKEN_TYPE);
             throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token type", Response.Status.BAD_REQUEST);
         }
+
+        if (context != null) {
+            autoLinkIfPossible(context);
+        }
+        return context;
     }
+    private void autoLinkIfPossible(BrokeredIdentityContext context) {
+        RealmModel realm = this.session.getContext().getRealm();
+        String email = context.getEmail();
+        if (email == null || email.isBlank()) {
+            return;
+        }
+
+        UserModel existing = this.session.users().getUserByEmail(realm, email);
+        if (existing == null) {
+            return;
+        }
+
+        String providerAlias = getConfig().getAlias();
+
+        // Check if already linked to this provider
+        FederatedIdentityModel existingLink = this.session.users().getFederatedIdentity(realm, existing, providerAlias);
+        if (existingLink != null) {
+            if (!existingLink.getUserId().equals(context.getId())) {
+                // Optional: Handle case where email matches but sub (Apple ID) differs - customize as needed
+                throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "User already linked to a different Apple account", Response.Status.BAD_REQUEST);
+            }
+            return; // Already linked to the same account, no action needed
+        }
+
+        // Auto-link by adding the federated identity
+        FederatedIdentityModel newLink = new FederatedIdentityModel(providerAlias, context.getId(), context.getUsername());
+        this.session.users().addFederatedIdentity(realm, existing, newLink);
+
+        // Update existing user's profile if needed
+        if (existing.getFirstName() == null) {
+            existing.setFirstName(context.getFirstName());
+        }
+        if (existing.getLastName() == null) {
+            existing.setLastName(context.getLastName());
+        }
+    }
+
 
     // NOTE: slightly modified version of OIDCIdentityProvider.validateJWT
     private BrokeredIdentityContext validateAppleIdToken(EventBuilder event, String subjectToken) {
