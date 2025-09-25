@@ -10,6 +10,7 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
     private static final String DISPLAY_ICON_CLASSES = "fa fa-apple";
     private static final String DISPLAY_NAME = "displayName";
     private static final String DEFAULT_DISPLAY_NAME = "Sign in with Apple";
+    private static final String CUSTOM_REDIRECT_URI = "redirectUri";
 
     public AppleIdentityProviderConfig(IdentityProviderModel identityProviderModel) {
         super(identityProviderModel);
@@ -32,6 +33,14 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     public void setKeyId(String keyId) {
         getConfig().put(KEY_ID, keyId);
+    }
+
+    public String getRedirectUri() {
+        return getConfig().get(CUSTOM_REDIRECT_URI);
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        getConfig().put(CUSTOM_REDIRECT_URI, redirectUri);
     }
 
     @Override

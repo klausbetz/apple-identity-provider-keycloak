@@ -1,5 +1,7 @@
 package at.klausbetz.provider;
 
+import org.keycloak.models.FederatedIdentityModel;
+import org.keycloak.models.UserModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.ws.rs.core.MultivaluedMap;
@@ -234,12 +236,26 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     public SimpleHttp generateTokenRequest(String authorizationCode, String clientId) {
         KeycloakContext context = session.getContext();
         VaultStringSecret clientSecret = session.vault().getStringSecret(getConfig().getClientSecret());
+        String redirectUri = resolveRedirectUri(context, getConfig());
+
         return SimpleHttp.doPost(getConfig().getTokenUrl(), session)
                          .param(OAUTH2_PARAMETER_CODE, authorizationCode)
-                         .param(OAUTH2_PARAMETER_REDIRECT_URI, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), getConfig().getAlias(), context.getRealm().getName()).toString())
+                         .param(OAUTH2_PARAMETER_REDIRECT_URI, redirectUri)
                          .param(OAUTH2_PARAMETER_GRANT_TYPE, OAUTH2_GRANT_TYPE_AUTHORIZATION_CODE)
                          .param(OAUTH2_PARAMETER_CLIENT_ID, clientId)
                          .param(OAUTH2_PARAMETER_CLIENT_SECRET, clientSecret.get().orElse(getConfig().getClientSecret()));
+    }
+
+    private String resolveRedirectUri(KeycloakContext context, AppleIdentityProviderConfig cfg) {
+        String override = cfg != null ? cfg.getRedirectUri() : null;
+        if (override != null && !override.isBlank()) {
+            return override;
+        }
+        return Urls.identityProviderAuthnResponse(
+                context.getUri().getBaseUri(),
+                getConfig().getAlias(),
+                context.getRealm().getName()
+        ).toString();
     }
 
     private String generateJWS(String p8Content, String keyId, String teamId, String clientId) {

@@ -39,6 +39,7 @@ public class AppleIdentityProviderFactory extends AbstractIdentityProviderFactor
                                            .property().name("displayName").label("Display name").helpText("Text that is shown on the login page. Defaults to 'Sign in with Apple'").type(ProviderConfigProperty.STRING_TYPE).add()
                                            .property().name("teamId").label("Team ID").helpText("Your 10-character Team ID obtained from your Apple developer account.").type(ProviderConfigProperty.STRING_TYPE).add()
                                            .property().name("keyId").label("Key ID").helpText("A 10-character key identifier obtained from your Apple developer account.").type(ProviderConfigProperty.STRING_TYPE).add()
-                                           .build();
+                                           .property().name("redirectUri").label("Token Exchange Redirect URI (override)").helpText("Optional. If set, this URI will be used as 'redirect_uri' for Apple during code exchange.Leave empty to use the default Keycloak broker redirect URL.").type(ProviderConfigProperty.STRING_TYPE).add()
+                .build();
     }
 }
