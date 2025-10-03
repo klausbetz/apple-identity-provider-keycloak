@@ -24,9 +24,7 @@ import org.keycloak.events.EventBuilder;
 import org.keycloak.jose.jws.JWSBuilder;
 import org.keycloak.jose.jws.JWSInput;
 import org.keycloak.jose.jws.JWSInputException;
-import org.keycloak.models.KeycloakContext;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
+import org.keycloak.models.*;
 import org.keycloak.protocol.oidc.OIDCLoginProtocol;
 import org.keycloak.representations.JsonWebToken;
 import org.keycloak.services.ErrorResponseException;
@@ -93,18 +91,19 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
                 context = handleUserJson(context, exchangeParams.getUserJson());
             }
         } else if (APPLE_AUTHZ_CODE.equals(exchangeParams.getSubjectTokenType())) {
-            context = exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier());
+            context = exchangeAuthorizationCode(exchangeParams.getSubjectToken(), exchangeParams.getUserJson(), exchangeParams.getAppIdentifier(), exchangeParams.getAppRedirectUri());
         } else {
             event.detail(Details.REASON, OAuth2Constants.SUBJECT_TOKEN_TYPE + " invalid");
             event.error(Errors.INVALID_TOKEN_TYPE);
             throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "invalid token type", Response.Status.BAD_REQUEST);
         }
 
-        if (context != null) {
+        if (context != null && getConfig().isTokenExchangeAccountLinkingEnabled()) {
             autoLinkIfPossible(context);
         }
         return context;
     }
+
     private void autoLinkIfPossible(BrokeredIdentityContext context) {
         RealmModel realm = this.session.getContext().getRealm();
         String email = context.getEmail();
@@ -119,29 +118,14 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
         String providerAlias = getConfig().getAlias();
 
-        // Check if already linked to this provider
         FederatedIdentityModel existingLink = this.session.users().getFederatedIdentity(realm, existing, providerAlias);
         if (existingLink != null) {
-            if (!existingLink.getUserId().equals(context.getId())) {
-                // Optional: Handle case where email matches but sub (Apple ID) differs - customize as needed
-                throw new ErrorResponseException(OAuthErrorException.INVALID_TOKEN, "User already linked to a different Apple account", Response.Status.BAD_REQUEST);
-            }
-            return; // Already linked to the same account, no action needed
+            return; // The keycloak user has already been linked to this provider; can be the same Apple user or not; either way we're done
         }
 
-        // Auto-link by adding the federated identity
         FederatedIdentityModel newLink = new FederatedIdentityModel(providerAlias, context.getId(), context.getUsername());
         this.session.users().addFederatedIdentity(realm, existing, newLink);
-
-        // Update existing user's profile if needed
-        if (existing.getFirstName() == null) {
-            existing.setFirstName(context.getFirstName());
-        }
-        if (existing.getLastName() == null) {
-            existing.setLastName(context.getLastName());
-        }
     }
-
 
     // NOTE: slightly modified version of OIDCIdentityProvider.validateJWT
     private BrokeredIdentityContext validateAppleIdToken(EventBuilder event, String subjectToken) {
@@ -199,8 +183,8 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         }
     }
 
-    public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String clientId, String userDataJson, AuthenticationSessionModel authSession) throws IOException {
-        SimpleHttp.Response response = generateTokenRequest(authorizationCode, clientId).asResponse();
+    public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String clientId, String userDataJson, AuthenticationSessionModel authSession, String redirectUri) throws IOException {
+        SimpleHttp.Response response = generateTokenRequest(authorizationCode, clientId, redirectUri).asResponse();
 
         if (response.getStatus() > 299) {
             logger.warn("Error response from apple: status=" + response.getStatus() + ", body=" + response.asString() + " Please consult the docs at https://github.com/klausbetz/apple-identity-provider-keycloak for troubleshooting");
@@ -231,12 +215,11 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         return super.validateToken(encodedToken, true);
     }
 
-    public SimpleHttp generateTokenRequest(String authorizationCode, String clientId) {
-        KeycloakContext context = session.getContext();
+    public SimpleHttp generateTokenRequest(String authorizationCode, String clientId, String redirectUri) {
         VaultStringSecret clientSecret = session.vault().getStringSecret(getConfig().getClientSecret());
         return SimpleHttp.doPost(getConfig().getTokenUrl(), session)
                          .param(OAUTH2_PARAMETER_CODE, authorizationCode)
-                         .param(OAUTH2_PARAMETER_REDIRECT_URI, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), getConfig().getAlias(), context.getRealm().getName()).toString())
+                         .param(OAUTH2_PARAMETER_REDIRECT_URI, redirectUri)
                          .param(OAUTH2_PARAMETER_GRANT_TYPE, OAUTH2_GRANT_TYPE_AUTHORIZATION_CODE)
                          .param(OAUTH2_PARAMETER_CLIENT_ID, clientId)
                          .param(OAUTH2_PARAMETER_CLIENT_SECRET, clientSecret.get().orElse(getConfig().getClientSecret()));
@@ -291,11 +274,12 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         return jwt;
     }
 
-    private BrokeredIdentityContext exchangeAuthorizationCode(String authorizationCode, String userJson, String appIdentifier) {
+    private BrokeredIdentityContext exchangeAuthorizationCode(String authorizationCode, String userJson, String appIdentifier, String appRedirectUri) {
         String clientId = appIdentifier != null && !appIdentifier.isBlank() ? appIdentifier : getConfig().getClientId();
+        String redirectUri = appRedirectUri != null ? appRedirectUri : Urls.identityProviderAuthnResponse(session.getContext().getUri().getBaseUri(), getConfig().getAlias(), session.getContext().getRealm().getName()).toString();
         try {
             prepareClientSecret(clientId);
-            return sendTokenRequest(authorizationCode, clientId, userJson, null);
+            return sendTokenRequest(authorizationCode, clientId, userJson, null, redirectUri);
         } catch (IOException e) {
             logger.warn("Error exchanging apple authorization_code. clientId=" + clientId, e);
             return null;

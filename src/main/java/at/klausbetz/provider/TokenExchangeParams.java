@@ -5,6 +5,7 @@ import org.keycloak.OAuth2Constants;
 
 public class TokenExchangeParams {
     private String appIdentifier;
+    private String appRedirectUri;
     private String subjectToken;
     private String subjectTokenType;
     private String userJson;
@@ -14,10 +15,12 @@ public class TokenExchangeParams {
         this.subjectTokenType = params.getFirst(OAuth2Constants.SUBJECT_TOKEN_TYPE);
         this.userJson = params.getFirst("user_profile");
         this.appIdentifier = params.getFirst("app_identifier");
+        this.appRedirectUri = params.getFirst("app_redirect_uri");
 
         this.normalizeAppIdentifier();
         this.setTypeDefaultIfNull();
         this.normalizeUserJson();
+        this.normalizeAppRedirectUri();
     }
 
     private void normalizeAppIdentifier() {
@@ -38,6 +41,12 @@ public class TokenExchangeParams {
         }
     }
 
+    private void normalizeAppRedirectUri() {
+        if (this.appRedirectUri != null && this.appRedirectUri.isBlank()) {
+            this.appRedirectUri = null;
+        }
+    }
+
     public String getAppIdentifier() {
         return this.appIdentifier;
     }
@@ -52,5 +61,9 @@ public class TokenExchangeParams {
 
     public String getUserJson() {
         return this.userJson;
+    }
+
+    public String getAppRedirectUri() {
+        return this.appRedirectUri;
     }
 }

@@ -16,6 +16,7 @@ import org.keycloak.events.EventType;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.services.ErrorPage;
+import org.keycloak.services.Urls;
 import org.keycloak.services.messages.Messages;
 import org.keycloak.sessions.AuthenticationSessionModel;
 
@@ -61,6 +62,7 @@ public class AppleIdentityProviderEndpoint {
 
         AuthenticationSessionModel authSession = this.callback.getAndVerifyAuthenticationSession(state);
         session.getContext().setAuthenticationSession(authSession);
+        var context = session.getContext();
 
         if (error != null) {
             logger.warn(error + " for broker login " + appleIdentityProvider.getConfig().getProviderId());
@@ -77,7 +79,7 @@ public class AppleIdentityProviderEndpoint {
         try {
             if (authorizationCode != null) {
                 appleIdentityProvider.prepareClientSecret(appleIdentityProvider.getConfig().getClientId());
-                BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, appleIdentityProvider.getConfig().getClientId(), user, authSession);
+                BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, appleIdentityProvider.getConfig().getClientId(), user, authSession, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), appleIdentityProvider.getConfig().getAlias(), context.getRealm().getName()).toString());
                 if (federatedIdentity != null) {
                     return callback.authenticated(federatedIdentity);
                 }

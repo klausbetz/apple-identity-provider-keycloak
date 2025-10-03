@@ -7,6 +7,7 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     private static final String TEAM_ID = "teamId";
     private static final String KEY_ID = "keyId";
+    private static final String TOKEN_EXCHANGE_ACCOUNT_LINKING_ENABLED = "tokenExchangeAccountLinkingEnabled";
     private static final String DISPLAY_ICON_CLASSES = "fa fa-apple";
     private static final String DISPLAY_NAME = "displayName";
     private static final String DEFAULT_DISPLAY_NAME = "Sign in with Apple";
@@ -32,6 +33,14 @@ public class AppleIdentityProviderConfig extends OIDCIdentityProviderConfig {
 
     public void setKeyId(String keyId) {
         getConfig().put(KEY_ID, keyId);
+    }
+
+    public boolean isTokenExchangeAccountLinkingEnabled() {
+        return Boolean.parseBoolean(getConfig().get(TOKEN_EXCHANGE_ACCOUNT_LINKING_ENABLED));
+    }
+
+    public void setTokenExchangeAccountLinkingEnabled(boolean tokenExchangeAccountLinkingEnabled) {
+        getConfig().put(TOKEN_EXCHANGE_ACCOUNT_LINKING_ENABLED, Boolean.toString(tokenExchangeAccountLinkingEnabled));
     }
 
     @Override

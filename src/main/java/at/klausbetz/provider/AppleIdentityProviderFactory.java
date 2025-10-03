@@ -39,6 +39,7 @@ public class AppleIdentityProviderFactory extends AbstractIdentityProviderFactor
                                            .property().name("displayName").label("Display name").helpText("Text that is shown on the login page. Defaults to 'Sign in with Apple'").type(ProviderConfigProperty.STRING_TYPE).add()
                                            .property().name("teamId").label("Team ID").helpText("Your 10-character Team ID obtained from your Apple developer account.").type(ProviderConfigProperty.STRING_TYPE).add()
                                            .property().name("keyId").label("Key ID").helpText("A 10-character key identifier obtained from your Apple developer account.").type(ProviderConfigProperty.STRING_TYPE).add()
+                                           .property().name("tokenExchangeAccountLinkingEnabled").label("Token-Exchange links existing accounts").helpText("If enabled, the token-exchange can link an existing user to the given Apple Login (similar to first browser login flow).").type(ProviderConfigProperty.BOOLEAN_TYPE).defaultValue(true).add()
                                            .build();
     }
 }
