@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'at.klausbetz'
-version '1.16.0-alpha'
+version '1.16.0'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 ext {
