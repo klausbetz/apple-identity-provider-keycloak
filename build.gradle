@@ -8,7 +8,7 @@ version '1.16.0'
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 ext {
-    keycloakVersion = '26.3.0'
+    keycloakVersion = '26.5.0'
 }
 
 repositories {

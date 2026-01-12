@@ -8,7 +8,7 @@ import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.OAuthErrorException;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
-import org.keycloak.broker.provider.IdentityProvider;
+import org.keycloak.broker.provider.UserAuthenticationIdentityProvider;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
@@ -33,12 +33,12 @@ public class AppleIdentityProviderEndpoint {
 
     private final AppleIdentityProvider appleIdentityProvider;
     private final RealmModel realm;
-    private final IdentityProvider.AuthenticationCallback callback;
+    private final UserAuthenticationIdentityProvider.AuthenticationCallback callback;
     private final EventBuilder event;
 
     protected KeycloakSession session;
 
-    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, IdentityProvider.AuthenticationCallback callback, EventBuilder event, KeycloakSession session) {
+    public AppleIdentityProviderEndpoint(AppleIdentityProvider appleIdentityProvider, RealmModel realm, UserAuthenticationIdentityProvider.AuthenticationCallback callback, EventBuilder event, KeycloakSession session) {
         this.appleIdentityProvider = appleIdentityProvider;
         this.realm = realm;
         this.callback = callback;
