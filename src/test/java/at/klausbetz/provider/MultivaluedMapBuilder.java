@@ -31,6 +31,11 @@ public class MultivaluedMapBuilder {
         return this;
     }
 
+    public MultivaluedMapBuilder appRedirectUri(String appRedirectUri) {
+        params.put("app_redirect_uri", appRedirectUri != null ? List.of(appRedirectUri) : Collections.emptyList());
+        return this;
+    }
+
     public MultivaluedMap<String, String> build() {
         return params;
     }

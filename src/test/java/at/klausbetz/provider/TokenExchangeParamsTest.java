@@ -86,4 +86,28 @@ class TokenExchangeParamsTest {
         assertNull(exchangeParams.getUserJson());
         assertNull(exchangeParams.getAppIdentifier());
     }
+
+    @Test
+    void givenValidExchangeRequestWithAppRedirectUri_whenCreatingTokenExchangeParams_thenRedirectUriIsParsed() {
+        MultivaluedMap<String, String> params = new MultivaluedMapBuilder().subjectToken("myFancyAppleAuthorizationCode").appRedirectUri("https://example.com/callback").build();
+        TokenExchangeParams exchangeParams = new TokenExchangeParams(params);
+
+        assertEquals("https://example.com/callback", exchangeParams.getAppRedirectUri());
+    }
+
+    @Test
+    void givenValidExchangeRequestWithBlankAppRedirectUri_whenCreatingTokenExchangeParams_thenRedirectUriIsNormalized() {
+        MultivaluedMap<String, String> params = new MultivaluedMapBuilder().subjectToken("myFancyAppleAuthorizationCode").appRedirectUri("   ").build();
+        TokenExchangeParams exchangeParams = new TokenExchangeParams(params);
+
+        assertNull(exchangeParams.getAppRedirectUri());
+    }
+
+    @Test
+    void givenValidExchangeRequestWithNullAppRedirectUri_whenCreatingTokenExchangeParams_thenRedirectUriIsNull() {
+        MultivaluedMap<String, String> params = new MultivaluedMapBuilder().subjectToken("myFancyAppleAuthorizationCode").appRedirectUri(null).build();
+        TokenExchangeParams exchangeParams = new TokenExchangeParams(params);
+
+        assertNull(exchangeParams.getAppRedirectUri());
+    }
 }

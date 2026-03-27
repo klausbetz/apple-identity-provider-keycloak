@@ -5,7 +5,7 @@ plugins {
 
 group 'at.klausbetz'
 version '1.17.0'
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_21
 
 ext {
     keycloakVersion = '26.5.0'
@@ -23,10 +23,16 @@ dependencies {
 
     testImplementation "org.keycloak:keycloak-services:$keycloakVersion"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+    testRuntimeOnly 'org.jboss.resteasy:resteasy-core:6.2.4.Final'
 }
 
 test {
     useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
 }
 
 java {
@@ -44,6 +50,6 @@ publishing {
 
 // run 'gradle wrapper' to regenerate gradle/ folder
 wrapper {
-    gradleVersion = "8.0.2"
+    gradleVersion = "8.10.2"
     distributionType = Wrapper.DistributionType.BIN
 }
