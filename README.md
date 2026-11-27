@@ -70,7 +70,7 @@ Log into your Keycloak admin console and add `Apple` as new `Identity Provider` 
 | Key ID                                  | A key identifier obtained from your Apple Developer Account.                                                                                                                                                   |
 | p8 Key                                  | (replaced by Client Secret since `v1.14.0`) Raw content of p8 key file you get from your Apple Developer Account.                                                                                              |
 | Default Scopes                          | Scopes to request from Apple (for web-based logins). Defaults to `name%20email`                                                                                                                                |
-| Token-Exchange links existing accounts  | Since `1.16.0`. If enabled, accounts are automatically linked to existing keycloak accounts (since the flow `first broker login` is not invoked for token exchanges that would take care of that automatically |
+| Token-Exchange links existing accounts  | Since `1.16.0`. If enabled, accounts are automatically linked to existing keycloak accounts (since the flow `first broker login` is not invoked for token exchanges that would take care of that automatically). Since `1.18.0` accounts are only linked if the email is part of the Apple ID-Token and verified by Apple; an email sent via `user_profile` is never used for linking |
 
 :raising_hand: If you are unsure where you get these values from your Apple Developer Account, you may want to check out
 this [guide](https://github.com/klausbetz/apple-identity-provider-keycloak/wiki/Configuration-within-Apple-Developer-portal).
@@ -110,7 +110,7 @@ You want to use the `/token` endpoint of your realm to exchange an Apple ID-Toke
 | `grant_type`         | `urn:ietf:params:oauth:grant-type:token-exchange`                                                                                                                                                                 |
 | `subject_token`      | ID-Token from Apple                                                                                                                                                                                               |
 | `subject_issuer`     | `apple` (the name of the social provider in keycloak)                                                                                                                                                             |
-| `subject_token_type` | `urn:ietf:params:oauth:token-type:id_token`                                                                                                                                                                       |
+| `subject_token_type` | `urn:ietf:params:oauth:token-type:id_token` (`urn:ietf:params:oauth:token-type:jwt` is accepted as well since `1.18.0`)                                                                                            |
 | `user_profile`       | `{ "name": { "firstName": string, "lastName": string }, "email": string }` optional. The JSON string that Apple sends on the first login (only required for the first login if you want to store the user's name) |
 
 ### 2. Using Apple `authorization_code`

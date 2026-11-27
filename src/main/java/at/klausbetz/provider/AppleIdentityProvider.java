@@ -85,7 +85,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         }
 
         BrokeredIdentityContext context;
-        if (OAuth2Constants.ID_TOKEN_TYPE.equals(exchangeParams.getSubjectTokenType())) {
+        if (exchangeParams.isIdToken()) {
             context = validateAppleIdToken(event, exchangeParams.getSubjectToken());
             if (exchangeParams.getUserJson() != null) {
                 context = handleUserJson(context, exchangeParams.getUserJson());
@@ -108,6 +108,12 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
         RealmModel realm = this.session.getContext().getRealm();
         String email = context.getEmail();
         if (email == null || email.isBlank()) {
+            return;
+        }
+
+        Object validatedIdToken = context.getContextData().get(VALIDATED_ID_TOKEN);
+        if (!AppleAccountLinking.isVerifiedTokenEmail(validatedIdToken instanceof JsonWebToken token ? token : null, email)) {
+            logger.infof("Not linking Apple identity '%s' to an existing account: email is not a verified email from the Apple ID-Token", context.getId());
             return;
         }
 
@@ -186,7 +192,7 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
     }
 
     public BrokeredIdentityContext sendTokenRequest(String authorizationCode, String clientId, String userDataJson, AuthenticationSessionModel authSession, String redirectUri) throws IOException {
-        SimpleHttp.Response response = generateTokenRequest(authorizationCode, clientId, redirectUri).asResponse();
+        SimpleHttp.Response response = AppleRequestRetry.execute(() -> generateTokenRequest(authorizationCode, clientId, redirectUri).asResponse());
 
         if (response.getStatus() > 299) {
             logger.warn("Error response from apple: status=" + response.getStatus() + ", body=" + response.asString() + " Please consult the docs at https://github.com/klausbetz/apple-identity-provider-keycloak for troubleshooting");

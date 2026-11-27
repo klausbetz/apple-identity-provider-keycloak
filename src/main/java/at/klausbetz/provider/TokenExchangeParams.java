@@ -59,6 +59,10 @@ public class TokenExchangeParams {
         return this.subjectTokenType;
     }
 
+    public boolean isIdToken() {
+        return OAuth2Constants.ID_TOKEN_TYPE.equals(this.subjectTokenType) || OAuth2Constants.JWT_TOKEN_TYPE.equals(this.subjectTokenType);
+    }
+
     public String getUserJson() {
         return this.userJson;
     }

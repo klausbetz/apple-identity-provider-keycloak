@@ -7,14 +7,18 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.OAuthErrorException;
+import org.keycloak.authentication.authenticators.broker.AbstractIdpAuthenticator;
+import org.keycloak.authentication.authenticators.broker.util.SerializedBrokeredIdentityContext;
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.UserAuthenticationIdentityProvider;
 import org.keycloak.broker.provider.util.IdentityBrokerState;
 import org.keycloak.events.Errors;
 import org.keycloak.events.EventBuilder;
 import org.keycloak.events.EventType;
+import org.keycloak.models.FederatedIdentityModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
+import org.keycloak.models.UserModel;
 import org.keycloak.services.ErrorPage;
 import org.keycloak.services.Urls;
 import org.keycloak.services.messages.Messages;
@@ -81,6 +85,7 @@ public class AppleIdentityProviderEndpoint {
                 appleIdentityProvider.prepareClientSecret(appleIdentityProvider.getConfig().getClientId());
                 BrokeredIdentityContext federatedIdentity = appleIdentityProvider.sendTokenRequest(authorizationCode, appleIdentityProvider.getConfig().getClientId(), user, authSession, Urls.identityProviderAuthnResponse(context.getUri().getBaseUri(), appleIdentityProvider.getConfig().getAlias(), context.getRealm().getName()).toString());
                 if (federatedIdentity != null) {
+                    clearStaleFirstBrokerLoginContext(authSession, federatedIdentity);
                     return callback.authenticated(federatedIdentity);
                 }
             }
@@ -90,6 +95,29 @@ public class AppleIdentityProviderEndpoint {
             logger.error("Failed to complete apple identity provider oauth callback", e);
         }
         return errorIdentityProviderLogin(Messages.IDENTITY_PROVIDER_UNEXPECTED_ERROR);
+    }
+
+    void clearStaleFirstBrokerLoginContext(AuthenticationSessionModel authSession, BrokeredIdentityContext federatedIdentity) {
+        if (authSession == null || federatedIdentity == null) {
+            return;
+        }
+
+        SerializedBrokeredIdentityContext pendingContext = SerializedBrokeredIdentityContext.readFromAuthenticationSession(authSession, AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
+        String providerAlias = appleIdentityProvider.getConfig().getAlias();
+        if (pendingContext == null || !providerAlias.equals(pendingContext.getIdentityProviderId())) {
+            return;
+        }
+
+        FederatedIdentityModel federatedIdentityModel = new FederatedIdentityModel(providerAlias, federatedIdentity.getId(), federatedIdentity.getUsername());
+        UserModel linkedUser = session.users().getUserByFederatedIdentity(realm, federatedIdentityModel);
+        if (linkedUser == null) {
+            return;
+        }
+
+        logger.debugf("Apple identity '%s' is already linked to user '%s'. Removing stale first-broker-login context from authentication session.", federatedIdentity.getId(), linkedUser.getUsername());
+        authSession.removeAuthNote(AbstractIdpAuthenticator.BROKERED_CONTEXT_NOTE);
+        authSession.removeAuthNote(AbstractIdpAuthenticator.NESTED_FIRST_BROKER_CONTEXT);
+        authSession.removeAuthNote(AbstractIdpAuthenticator.FIRST_BROKER_LOGIN_SUCCESS);
     }
 
     private Response errorIdentityProviderLogin(String message) {

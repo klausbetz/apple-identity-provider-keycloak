@@ -2,8 +2,11 @@ package at.klausbetz.provider;
 
 import jakarta.ws.rs.core.MultivaluedMap;
 import org.junit.jupiter.api.Test;
+import org.keycloak.OAuth2Constants;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class TokenExchangeParamsTest {
@@ -85,5 +88,13 @@ class TokenExchangeParamsTest {
         assertEquals(AppleIdentityProvider.APPLE_AUTHZ_CODE, exchangeParams.getSubjectTokenType());
         assertNull(exchangeParams.getUserJson());
         assertNull(exchangeParams.getAppIdentifier());
+    }
+
+    @Test
+    void givenIdTokenOrJwtTokenType_whenCreatingTokenExchangeParams_thenTreatedAsIdToken() {
+        assertTrue(new TokenExchangeParams(new MultivaluedMapBuilder().subjectToken("appleIdToken").subjectTokenType(OAuth2Constants.ID_TOKEN_TYPE).build()).isIdToken());
+        assertTrue(new TokenExchangeParams(new MultivaluedMapBuilder().subjectToken("appleIdToken").subjectTokenType(OAuth2Constants.JWT_TOKEN_TYPE).build()).isIdToken());
+        assertFalse(new TokenExchangeParams(new MultivaluedMapBuilder().subjectToken("appleAuthzCode").build()).isIdToken());
+        assertFalse(new TokenExchangeParams(new MultivaluedMapBuilder().subjectToken("token").subjectTokenType(OAuth2Constants.ACCESS_TOKEN_TYPE).build()).isIdToken());
     }
 }
