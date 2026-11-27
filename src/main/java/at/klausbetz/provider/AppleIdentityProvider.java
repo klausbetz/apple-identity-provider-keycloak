@@ -174,12 +174,14 @@ public class AppleIdentityProvider extends OIDCIdentityProvider implements Socia
 
     public void prepareClientSecret(String clientId) {
         if (!isValidSecret(getConfig().getClientSecret())) {
-            getConfig().setClientSecret(generateJWS(
-                    getConfig().getClientSecret(),
-                    getConfig().getKeyId(),
-                    getConfig().getTeamId(),
-                    clientId)
-            );
+            try (VaultStringSecret p8Content = session.vault().getStringSecret(getConfig().getClientSecret())) {
+                getConfig().setClientSecret(generateJWS(
+                        p8Content.get().orElse(getConfig().getClientSecret()),
+                        getConfig().getKeyId(),
+                        getConfig().getTeamId(),
+                        clientId)
+                );
+            }
         }
     }
 
